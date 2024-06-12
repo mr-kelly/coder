@@ -2461,10 +2461,6 @@ func (s *MethodTestSuite) TestSystemFunctions() {
 		// TODO: update this test once we have a specific role for notifications
 		check.Args(database.FetchNewMessageMetadataParams{}).Asserts(rbac.ResourceSystem, policy.ActionRead)
 	}))
-	s.Run("InsertNotificationTemplate", s.Subtest(func(db database.Store, check *expects) {
-		// TODO: update this test once we have a specific role for notifications
-		check.Args(database.InsertNotificationTemplateParams{}).Asserts(rbac.ResourceSystem, policy.ActionCreate)
-	}))
 }
 
 func (s *MethodTestSuite) TestOAuth2ProviderApps() {

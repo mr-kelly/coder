@@ -3202,7 +3202,6 @@ WITH acquired AS (
                 leased_until = NOW() + CONCAT($2::int, ' seconds')::interval
             WHERE id IN (SELECT nm.id
                          FROM notification_messages AS nm
-                                  LEFT JOIN notification_templates AS nt ON (nm.notification_template_id = nt.id)
                          WHERE (
                              (
                                  -- message is in acquirable states
@@ -3355,18 +3354,17 @@ func (q *sqlQuerier) BulkMarkNotificationMessagesFailed(ctx context.Context, arg
 }
 
 const bulkMarkNotificationMessagesSent = `-- name: BulkMarkNotificationMessagesSent :execrows
-WITH new_values AS (SELECT UNNEST($1::uuid[])             AS id,
-                           UNNEST($2::timestamptz[]) AS sent_at)
 UPDATE notification_messages
-SET updated_at       = subquery.sent_at,
+SET updated_at       = new_values.sent_at,
     attempt_count    = attempt_count + 1,
     status           = 'sent'::notification_message_status,
     status_reason    = NULL,
     leased_until     = NULL,
     next_retry_after = NULL
-FROM (SELECT id, sent_at
-      FROM new_values) AS subquery
-WHERE notification_messages.id = subquery.id
+FROM (SELECT UNNEST($1::uuid[])        AS id,
+             UNNEST($2::timestamptz[]) AS sent_at)
+         AS new_values
+WHERE notification_messages.id = new_values.id
 `
 
 type BulkMarkNotificationMessagesSentParams struct {
@@ -3388,9 +3386,7 @@ FROM notification_messages
 WHERE id IN
       (SELECT id
        FROM notification_messages AS nested
-       WHERE nested.updated_at < NOW() - INTERVAL '7 days'
-             -- ensure we don't clash with the notifier
-           FOR UPDATE SKIP LOCKED)
+       WHERE nested.updated_at < NOW() - INTERVAL '7 days')
 `
 
 // Delete all notification messages which have not been updated for over a week.
@@ -3486,40 +3482,6 @@ func (q *sqlQuerier) FetchNewMessageMetadata(ctx context.Context, arg FetchNewMe
 		&i.UserID,
 		&i.UserEmail,
 		&i.UserName,
-	)
-	return i, err
-}
-
-const insertNotificationTemplate = `-- name: InsertNotificationTemplate :one
-INSERT INTO notification_templates (id, name, title_template, body_template, "group")
-VALUES ($1, $2, $3, $4, $5)
-RETURNING id, name, title_template, body_template, actions, "group"
-`
-
-type InsertNotificationTemplateParams struct {
-	ID            uuid.UUID      `db:"id" json:"id"`
-	Name          string         `db:"name" json:"name"`
-	TitleTemplate string         `db:"title_template" json:"title_template"`
-	BodyTemplate  string         `db:"body_template" json:"body_template"`
-	Group         sql.NullString `db:"group" json:"group"`
-}
-
-func (q *sqlQuerier) InsertNotificationTemplate(ctx context.Context, arg InsertNotificationTemplateParams) (NotificationTemplate, error) {
-	row := q.db.QueryRowContext(ctx, insertNotificationTemplate,
-		arg.ID,
-		arg.Name,
-		arg.TitleTemplate,
-		arg.BodyTemplate,
-		arg.Group,
-	)
-	var i NotificationTemplate
-	err := row.Scan(
-		&i.ID,
-		&i.Name,
-		&i.TitleTemplate,
-		&i.BodyTemplate,
-		&i.Actions,
-		&i.Group,
 	)
 	return i, err
 }

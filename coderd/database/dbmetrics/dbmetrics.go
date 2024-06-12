@@ -1565,13 +1565,6 @@ func (m metricsStore) InsertMissingGroups(ctx context.Context, arg database.Inse
 	return r0, r1
 }
 
-func (m metricsStore) InsertNotificationTemplate(ctx context.Context, arg database.InsertNotificationTemplateParams) (database.NotificationTemplate, error) {
-	start := time.Now()
-	r0, r1 := m.s.InsertNotificationTemplate(ctx, arg)
-	m.queryLatencies.WithLabelValues("InsertNotificationTemplate").Observe(time.Since(start).Seconds())
-	return r0, r1
-}
-
 func (m metricsStore) InsertOAuth2ProviderApp(ctx context.Context, arg database.InsertOAuth2ProviderAppParams) (database.OAuth2ProviderApp, error) {
 	start := time.Now()
 	r0, r1 := m.s.InsertOAuth2ProviderApp(ctx, arg)

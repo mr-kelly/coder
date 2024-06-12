@@ -3278,21 +3278,6 @@ func (mr *MockStoreMockRecorder) InsertMissingGroups(arg0, arg1 any) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertMissingGroups", reflect.TypeOf((*MockStore)(nil).InsertMissingGroups), arg0, arg1)
 }
 
-// InsertNotificationTemplate mocks base method.
-func (m *MockStore) InsertNotificationTemplate(arg0 context.Context, arg1 database.InsertNotificationTemplateParams) (database.NotificationTemplate, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "InsertNotificationTemplate", arg0, arg1)
-	ret0, _ := ret[0].(database.NotificationTemplate)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// InsertNotificationTemplate indicates an expected call of InsertNotificationTemplate.
-func (mr *MockStoreMockRecorder) InsertNotificationTemplate(arg0, arg1 any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertNotificationTemplate", reflect.TypeOf((*MockStore)(nil).InsertNotificationTemplate), arg0, arg1)
-}
-
 // InsertOAuth2ProviderApp mocks base method.
 func (m *MockStore) InsertOAuth2ProviderApp(arg0 context.Context, arg1 database.InsertOAuth2ProviderAppParams) (database.OAuth2ProviderApp, error) {
 	m.ctrl.T.Helper()

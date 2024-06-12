@@ -6108,14 +6108,6 @@ func (q *FakeQuerier) InsertMissingGroups(_ context.Context, arg database.Insert
 	return newGroups, nil
 }
 
-func (*FakeQuerier) InsertNotificationTemplate(_ context.Context, arg database.InsertNotificationTemplateParams) (database.NotificationTemplate, error) {
-	err := validateDatabaseType(arg)
-	if err != nil {
-		return database.NotificationTemplate{}, err
-	}
-	return database.NotificationTemplate{}, nil
-}
-
 func (q *FakeQuerier) InsertOAuth2ProviderApp(_ context.Context, arg database.InsertOAuth2ProviderAppParams) (database.OAuth2ProviderApp, error) {
 	err := validateDatabaseType(arg)
 	if err != nil {

@@ -2501,13 +2501,6 @@ func (q *querier) InsertMissingGroups(ctx context.Context, arg database.InsertMi
 	return q.db.InsertMissingGroups(ctx, arg)
 }
 
-func (q *querier) InsertNotificationTemplate(ctx context.Context, arg database.InsertNotificationTemplateParams) (database.NotificationTemplate, error) {
-	if err := q.authorizeContext(ctx, policy.ActionCreate, rbac.ResourceSystem); err != nil {
-		return database.NotificationTemplate{}, err
-	}
-	return q.db.InsertNotificationTemplate(ctx, arg)
-}
-
 func (q *querier) InsertOAuth2ProviderApp(ctx context.Context, arg database.InsertOAuth2ProviderAppParams) (database.OAuth2ProviderApp, error) {
 	if err := q.authorizeContext(ctx, policy.ActionCreate, rbac.ResourceOauth2App); err != nil {
 		return database.OAuth2ProviderApp{}, err

@@ -1,8 +1,3 @@
--- name: InsertNotificationTemplate :one
-INSERT INTO notification_templates (id, name, title_template, body_template, "group")
-VALUES ($1, $2, $3, $4, $5)
-RETURNING *;
-
 -- name: FetchNewMessageMetadata :one
 -- This is used to build up the notification_message's JSON payload.
 SELECT nt.name                                                    AS notification_name,
@@ -47,7 +42,6 @@ WITH acquired AS (
                 leased_until = NOW() + CONCAT(sqlc.arg('lease_seconds')::int, ' seconds')::interval
             WHERE id IN (SELECT nm.id
                          FROM notification_messages AS nm
-                                  LEFT JOIN notification_templates AS nt ON (nm.notification_template_id = nt.id)
                          WHERE (
                              (
                                  -- message is in acquirable states
@@ -113,18 +107,17 @@ FROM (SELECT id, status, status_reason, failed_at
 WHERE notification_messages.id = subquery.id;
 
 -- name: BulkMarkNotificationMessagesSent :execrows
-WITH new_values AS (SELECT UNNEST(@ids::uuid[])             AS id,
-                           UNNEST(@sent_ats::timestamptz[]) AS sent_at)
 UPDATE notification_messages
-SET updated_at       = subquery.sent_at,
+SET updated_at       = new_values.sent_at,
     attempt_count    = attempt_count + 1,
     status           = 'sent'::notification_message_status,
     status_reason    = NULL,
     leased_until     = NULL,
     next_retry_after = NULL
-FROM (SELECT id, sent_at
-      FROM new_values) AS subquery
-WHERE notification_messages.id = subquery.id;
+FROM (SELECT UNNEST(@ids::uuid[])        AS id,
+             UNNEST(@sent_ats::timestamptz[]) AS sent_at)
+         AS new_values
+WHERE notification_messages.id = new_values.id;
 
 -- Delete all notification messages which have not been updated for over a week.
 -- name: DeleteOldNotificationMessages :exec
@@ -133,7 +126,5 @@ FROM notification_messages
 WHERE id IN
       (SELECT id
        FROM notification_messages AS nested
-       WHERE nested.updated_at < NOW() - INTERVAL '7 days'
-             -- ensure we don't clash with the notifier
-           FOR UPDATE SKIP LOCKED);
+       WHERE nested.updated_at < NOW() - INTERVAL '7 days');
 
