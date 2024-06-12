@@ -16,7 +16,6 @@ CREATE TABLE notification_templates
 (
     id             uuid                 NOT NULL,
     name           text                 NOT NULL,
-    enabled        boolean DEFAULT TRUE NOT NULL,
     title_template text                 NOT NULL,
     body_template  text                 NOT NULL,
     actions        jsonb,
@@ -51,8 +50,8 @@ CREATE TABLE notification_messages
 CREATE INDEX idx_notification_messages_status ON notification_messages (status);
 
 -- TODO: autogenerate constants which reference the UUIDs
-INSERT INTO notification_templates (id, name, enabled, title_template, body_template, "group", actions)
-VALUES ('f517da0b-cdc9-410f-ab89-a86107c420ed', 'Workspace Deleted', true, E'Workspace "{{.Labels.name}}" deleted',
+INSERT INTO notification_templates (id, name, title_template, body_template, "group", actions)
+VALUES ('f517da0b-cdc9-410f-ab89-a86107c420ed', 'Workspace Deleted', E'Workspace "{{.Labels.name}}" deleted',
         E'Hi {{.UserName}}\n\nYour workspace **{{.Labels.name}}** was deleted.\nThe specified reason was "**{{.Labels.reason}}**".',
         'Workspace Events', '[
         {

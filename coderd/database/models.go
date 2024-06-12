@@ -2031,7 +2031,6 @@ type NotificationMessage struct {
 type NotificationTemplate struct {
 	ID            uuid.UUID      `db:"id" json:"id"`
 	Name          string         `db:"name" json:"name"`
-	Enabled       bool           `db:"enabled" json:"enabled"`
 	TitleTemplate string         `db:"title_template" json:"title_template"`
 	BodyTemplate  string         `db:"body_template" json:"body_template"`
 	Actions       []byte         `db:"actions" json:"actions"`

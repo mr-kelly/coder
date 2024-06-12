@@ -3491,20 +3491,14 @@ func (q *sqlQuerier) FetchNewMessageMetadata(ctx context.Context, arg FetchNewMe
 }
 
 const insertNotificationTemplate = `-- name: InsertNotificationTemplate :one
-INSERT INTO notification_templates (id, name, enabled, title_template, body_template, "group")
-VALUES ($1,
-        $2,
-        $3,
-        $4,
-        $5,
-        $6)
-RETURNING id, name, enabled, title_template, body_template, actions, "group"
+INSERT INTO notification_templates (id, name, title_template, body_template, "group")
+VALUES ($1, $2, $3, $4, $5)
+RETURNING id, name, title_template, body_template, actions, "group"
 `
 
 type InsertNotificationTemplateParams struct {
 	ID            uuid.UUID      `db:"id" json:"id"`
 	Name          string         `db:"name" json:"name"`
-	Enabled       bool           `db:"enabled" json:"enabled"`
 	TitleTemplate string         `db:"title_template" json:"title_template"`
 	BodyTemplate  string         `db:"body_template" json:"body_template"`
 	Group         sql.NullString `db:"group" json:"group"`
@@ -3514,7 +3508,6 @@ func (q *sqlQuerier) InsertNotificationTemplate(ctx context.Context, arg InsertN
 	row := q.db.QueryRowContext(ctx, insertNotificationTemplate,
 		arg.ID,
 		arg.Name,
-		arg.Enabled,
 		arg.TitleTemplate,
 		arg.BodyTemplate,
 		arg.Group,
@@ -3523,7 +3516,6 @@ func (q *sqlQuerier) InsertNotificationTemplate(ctx context.Context, arg InsertN
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
-		&i.Enabled,
 		&i.TitleTemplate,
 		&i.BodyTemplate,
 		&i.Actions,

@@ -1,11 +1,6 @@
 -- name: InsertNotificationTemplate :one
-INSERT INTO notification_templates (id, name, enabled, title_template, body_template, "group")
-VALUES ($1,
-        $2,
-        $3,
-        $4,
-        $5,
-        $6)
+INSERT INTO notification_templates (id, name, title_template, body_template, "group")
+VALUES ($1, $2, $3, $4, $5)
 RETURNING *;
 
 -- name: FetchNewMessageMetadata :one

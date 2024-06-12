@@ -567,7 +567,6 @@ CREATE TABLE notification_messages (
 CREATE TABLE notification_templates (
     id uuid NOT NULL,
     name text NOT NULL,
-    enabled boolean DEFAULT true NOT NULL,
     title_template text NOT NULL,
     body_template text NOT NULL,
     actions jsonb,
