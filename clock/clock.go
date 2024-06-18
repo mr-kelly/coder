@@ -10,6 +10,12 @@ import (
 )
 
 type Clock interface {
+	// NewTicker returns a new Ticker containing a channel that will send the current time on the
+	// channel after each tick. The period of the ticks is specified by the duration argument. The
+	// ticker will adjust the time interval or drop ticks to make up for slow receivers. The
+	// duration d must be greater than zero; if not, NewTicker will panic. Stop the ticker to
+	// release associated resources.
+	NewTicker(d time.Duration, tags ...string) *Ticker
 	// TickerFunc is a convenience function that calls f on the interval d until either the given
 	// context expires or f returns an error.  Callers may call Wait() on the returned Waiter to
 	// wait until this happens and obtain the error.
